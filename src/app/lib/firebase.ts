@@ -1,14 +1,15 @@
 'server-only';
 
-import admin from 'firebase-admin';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 
 import type QuizType from '@/app/types/QuizType';
 import FetchedGameData from '../types/FetchedGameData';
 
 // Only initialize once (for server-side)
-if (!admin.apps.length) {
-	admin.initializeApp({
-		credential: admin.credential.cert({
+if (!getApps().length) {
+	initializeApp({
+		credential: cert({
 			projectId: process.env.FIREBASE_PROJECT_ID,
 			clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
 			privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
@@ -16,7 +17,7 @@ if (!admin.apps.length) {
 	});
 }
 
-const firestoreDb = admin.firestore();
+const firestoreDb = getFirestore();
 
 /**
  * Add a quiz record to Firestore (backend only)
@@ -86,7 +87,7 @@ async function incrementQuizViewCount(quizId: string) {
     try {
         const quizRef = firestoreDb.collection('quizzes').doc(quizId);
         await quizRef.update({
-            viewCount: admin.firestore.FieldValue.increment(1)
+            viewCount: FieldValue.increment(1)
         });
     } catch (error) {
         console.error('Error incrementing view count:', error);
