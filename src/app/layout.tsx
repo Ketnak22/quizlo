@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jetpunk Clone"
+  title: "quizlo",
+  description: "Quizy z wiedzy ogólnej i geografii: wpisywanie odpowiedzi, parowanie i mapy."
 };
 
 export default function RootLayout({

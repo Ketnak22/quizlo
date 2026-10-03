@@ -9,8 +9,6 @@ import MapJSONData from '@/app/types/MapJSONData';
 
 import removePolishChars from '@/app/utils/removePolishChars';
 
-import Image from 'next/image';
-
 export default function MapPlayer({ mapId }: { mapId: string }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -25,8 +23,6 @@ export default function MapPlayer({ mapId }: { mapId: string }) {
     const [highlightedPathId, setHighlightedPathId] = useState<string | null>(null);
     const [pathFills, setPathFills] = useState<Record<string, string>>({});
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-
-    const [overlayVisible, setOverlayVisible] = useState(false);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -167,8 +163,6 @@ export default function MapPlayer({ mapId }: { mapId: string }) {
         }
         setPathFills(newPathFills);
         setShowResults(true);
-
-        setOverlayVisible(true);
     }
 
     return (
@@ -222,16 +216,6 @@ export default function MapPlayer({ mapId }: { mapId: string }) {
                         </div>
                     )}
             </div>
-            {overlayVisible &&
-                <div className={styles.overlay}>
-                    <div className={styles['give-up-message']}>
-                        <p>Wojciech G. 14 miesiące temu·185.241.*.*</p>
-                        <p>Osoba która właśnie się poddała widać że jest głupim i nie do edukowanym dzieciakiem.Powiedź mi po co to robisz co ci do da robienie takich rzeczy? zdradzę ci sekret mam 13 lat i jestem od ciebie mądrzejszy a zakładam że jesteś starszy mimo to że powiedziałem że jesteś dzieckiem.Zapewne mentalnie jesteś bo żeby podstawowej wiedzy geograficznej nie znać to trzeba być serio głupim. do tego jeszcze swoją głupotą wyzywasz twórce. BRAWO rozumu. wyobraź sobie że tworzyłem te mapę bardzo długo i ucieszyłem się ukończyłem. i założę się że grając w ten quiz i tak nie myślałeś o tym jaka jest jakość. Więc weź się ogarnij bo robienie takich głupich rzeczy psuje twoją osobę. A jak taki mądry jesteś to prosze sam taką mapę wrzuć do jakiejś strony żeby ludzie mogli grać i zobaczymy jaką ty będziesz miał jakość. In case i don't see ya . Good afternoon, Good evening and good night</p>
-                        <Image src="/idiota.png" width={605} height={413} alt="Facepalm" />
-                        <button className={styles.closeOverlayBtn} onClick={() => setOverlayVisible(false)}>Zamknij komunikat</button>
-                    </div>
-                </div>
-            }
         </>
     );
 }

@@ -13,7 +13,7 @@ export default async function Home() {
         <div className={styles.contentWrapper}>
           <section className={styles.quizListSection}>
             <div className={styles.titleHolder}>
-              <h1>Witaj w Odrzutowiec2Wakacje</h1>
+              <h1>Witaj w quizlo</h1>
               <h2>Dostępne Quizy</h2>
             </div>
             <div className={styles.quizList}>

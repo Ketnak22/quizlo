@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 60" role="img" aria-label="quizlo">
+  <g fill="none" stroke="#1f2a37" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="20" cy="29" r="13" stroke="#1e7e34" />
+    <path d="M33 16v39" stroke="#1e7e34" />
+    <path d="M46 16v14a12 12 0 0 0 24 0V16v26" />
+    <path d="M83 16v26" />
+    <path d="M95 16h22L95 42h22" />
+    <path d="M130 4v38" />
+    <circle cx="154" cy="29" r="13" />
+  </g>
+  <circle cx="83" cy="5" r="4" fill="#1f2a37" />
+</svg>

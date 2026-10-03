@@ -7,7 +7,7 @@ export default function NavBar() {
         <header className={styles.header}>
         <div className={styles.headerContainer}>
           <a href="/" className={styles.logoLink}>
-            <Image className={"logoImage"} src="/logo.png" width={218.5} height={55} alt="Homepage Logo" priority />
+            <Image className={"logoImage"} src="/logo.svg" width={126} height={44} alt="quizlo" priority />
           </a>
           <nav className={styles.navContainer}>
             <a href="/create/quiz" className={styles.navButton}>Stwórz quiz</a>
