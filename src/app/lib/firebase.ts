@@ -8,13 +8,13 @@ import FetchedGameData from '../types/FetchedGameData';
 
 // Only initialize once (for server-side)
 if (!getApps().length) {
-	initializeApp({
-		credential: cert({
-			projectId: process.env.FIREBASE_PROJECT_ID,
-			clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-			privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-		}),
-	});
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
 }
 
 const firestoreDb = getFirestore();
@@ -27,7 +27,12 @@ const firestoreDb = getFirestore();
  * @param jsonData any
  * @param svgData string | undefined
  */
-async function addQuizRecordFirestore(type: QuizType, name: string, jsonData: any, svgData?: string) {
+async function addQuizRecordFirestore(
+  type: QuizType,
+  name: string,
+  jsonData: any,
+  svgData?: string,
+) {
   try {
     const docRef = await firestoreDb.collection('quizzes').add({
       type,
@@ -35,7 +40,7 @@ async function addQuizRecordFirestore(type: QuizType, name: string, jsonData: an
       jsonData,
       svgData: svgData || null,
       createdAt: new Date(),
-      viewCount: 0
+      viewCount: 0,
     });
     return docRef.id;
   } catch (error) {
@@ -48,35 +53,40 @@ async function addQuizRecordFirestore(type: QuizType, name: string, jsonData: an
  * Get all quiz names from Firestore (backend only)
  * @returns Array of quiz ids with names
  */
-async function getQuizzesIdsWithNames(): Promise<{ id: string, name: string }[]> {
-    try {
-        const snapshot = await firestoreDb.collection('quizzes').get();
-        return snapshot.docs.map(doc => ({
-            id: doc.id,
-            name: doc.data().name
-        }));
-    } catch (error) {
-        console.error('Error fetching quiz names from Firestore:', error);
-        throw error;
-    }
+async function getQuizzesIdsWithNames(): Promise<{ id: string; name: string }[]> {
+  try {
+    const snapshot = await firestoreDb.collection('quizzes').get();
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.data().name,
+    }));
+  } catch (error) {
+    console.error('Error fetching quiz names from Firestore:', error);
+    throw error;
+  }
 }
-
 
 /**
  * Get popular quizzes from Firestore (backend only)
  * @returns Array of popular quizzes
  */
-async function getPopularQuizzes(limit: number = 3): Promise<{ id: string, name: string}[] | null> {
-    try {
-        const snapshot = await firestoreDb.collection('quizzes').orderBy('viewCount', 'desc').limit(limit).get();
-        return snapshot.docs.map((doc) => ({
-            id: doc.id,
-            name: doc.data().name
-        }));
-    } catch (error) {
-        console.error('Error fetching popular quizzes from Firestore:', error);
-        throw error;
-    }
+async function getPopularQuizzes(
+  limit: number = 3,
+): Promise<{ id: string; name: string }[] | null> {
+  try {
+    const snapshot = await firestoreDb
+      .collection('quizzes')
+      .orderBy('viewCount', 'desc')
+      .limit(limit)
+      .get();
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.data().name,
+    }));
+  } catch (error) {
+    console.error('Error fetching popular quizzes from Firestore:', error);
+    throw error;
+  }
 }
 
 /**
@@ -84,15 +94,15 @@ async function getPopularQuizzes(limit: number = 3): Promise<{ id: string, name:
  * @param quizId string
  */
 async function incrementQuizViewCount(quizId: string) {
-    try {
-        const quizRef = firestoreDb.collection('quizzes').doc(quizId);
-        await quizRef.update({
-            viewCount: FieldValue.increment(1)
-        });
-    } catch (error) {
-        console.error('Error incrementing view count:', error);
-        throw error;
-    }
+  try {
+    const quizRef = firestoreDb.collection('quizzes').doc(quizId);
+    await quizRef.update({
+      viewCount: FieldValue.increment(1),
+    });
+  } catch (error) {
+    console.error('Error incrementing view count:', error);
+    throw error;
+  }
 }
 
 /**
@@ -101,18 +111,18 @@ async function incrementQuizViewCount(quizId: string) {
  * @returns gameData FetchedGameData | null
  */
 async function getGameById(gameId: string): Promise<FetchedGameData | null> {
-    try {
-        const quizRef = firestoreDb.collection('quizzes').doc(gameId);
-        const doc = await quizRef.get();
-        if (doc.exists) {
-            return doc.data() as FetchedGameData;
-        } else {
-            throw new Error('Quiz not found');
-        }
-    } catch (error) {
-        console.error('Error fetching quiz by ID:', error);
-        throw error;
+  try {
+    const quizRef = firestoreDb.collection('quizzes').doc(gameId);
+    const doc = await quizRef.get();
+    if (doc.exists) {
+      return doc.data() as FetchedGameData;
+    } else {
+      throw new Error('Quiz not found');
     }
+  } catch (error) {
+    console.error('Error fetching quiz by ID:', error);
+    throw error;
+  }
 }
 
 /**
@@ -121,20 +131,26 @@ async function getGameById(gameId: string): Promise<FetchedGameData | null> {
  * @returns Quiz type
  */
 async function getQuizTypeById(quizId: string): Promise<QuizType | null> {
-    try {
-        const quizRef = firestoreDb.collection('quizzes').doc(quizId);
-        const doc = await quizRef.get();
-        if (doc.exists) {
-            const data = doc.data();
-            return data?.type || null;
-        } else {
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching quiz type by ID:', error);
-        throw error;
+  try {
+    const quizRef = firestoreDb.collection('quizzes').doc(quizId);
+    const doc = await quizRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      return data?.type || null;
+    } else {
+      return null;
     }
+  } catch (error) {
+    console.error('Error fetching quiz type by ID:', error);
+    throw error;
+  }
 }
 
-
-export { addQuizRecordFirestore, getQuizzesIdsWithNames, getPopularQuizzes, incrementQuizViewCount, getGameById, getQuizTypeById };
+export {
+  addQuizRecordFirestore,
+  getQuizzesIdsWithNames,
+  getPopularQuizzes,
+  incrementQuizViewCount,
+  getGameById,
+  getQuizTypeById,
+};

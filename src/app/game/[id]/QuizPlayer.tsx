@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 
-import QuizData from "@/app/types/QuizData";
-import FetchedGameData from "@/app/types/FetchedGameData";
-import QuizJSONData from "@/app/types/QuizJSONData";
+import QuizData from '@/app/types/QuizData';
+import FetchedGameData from '@/app/types/FetchedGameData';
+import QuizJSONData from '@/app/types/QuizJSONData';
 
-import styles from "./QuizPlayer.module.css";
+import styles from './QuizPlayer.module.css';
 
-import removePolishChars from "@/app/utils/removePolishChars";
+import removePolishChars from '@/app/utils/removePolishChars';
 
 export default function QuizPlayer({ quizId }: { quizId: string }) {
   const [quiz, setQuiz] = useState<QuizData | null>(null);
@@ -32,17 +32,16 @@ export default function QuizPlayer({ quizId }: { quizId: string }) {
         const tdElement = answersTdRef.current[index];
         if (tdElement && tdElement.textContent !== answer) {
           tdElement.textContent = answer;
-          tdElement.classList.add("correct-answer");
+          tdElement.classList.add('correct-answer');
 
           setPoints((prev) => prev + 1);
 
-          e.target.value = "";
+          e.target.value = '';
 
           if (points + 1 == maxPoints) {
             e.target.disabled = true;
             setShowResults(true);
           }
-
         }
       }
     });
@@ -54,10 +53,10 @@ export default function QuizPlayer({ quizId }: { quizId: string }) {
       const tdElement = answersTdRef.current[index];
       if (tdElement && tdElement.textContent !== answer) {
         tdElement.textContent = answer;
-        tdElement.style.color = "#e02c4d";
+        tdElement.style.color = '#e02c4d';
       }
     });
-  }
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -65,18 +64,18 @@ export default function QuizPlayer({ quizId }: { quizId: string }) {
     (async () => {
       try {
         const res = await fetch(`/api/game/${encodeURIComponent(quizId)}`, {
-          cache: "no-store",
+          cache: 'no-store',
           signal: controller.signal,
         });
 
         if (!res.ok) {
-          throw new Error(res.status === 404 ? "Quiz not found" : "Failed to fetch quiz");
+          throw new Error(res.status === 404 ? 'Quiz not found' : 'Failed to fetch quiz');
         }
 
         const data: FetchedGameData = await res.json();
         const jsonData: QuizJSONData = JSON.parse(data.jsonData);
 
-        const naturalisedType = data.type === "matchingQuiz" ? "matchingQuiz" : "quiz";
+        const naturalisedType = data.type === 'matchingQuiz' ? 'matchingQuiz' : 'quiz';
 
         const quiz: QuizData = {
           id: quizId,
@@ -88,7 +87,7 @@ export default function QuizPlayer({ quizId }: { quizId: string }) {
           createdAt: data.createdAt,
         };
 
-        if (typeof data.createdAt === "number") {
+        if (typeof data.createdAt === 'number') {
           data.createdAt = new Date(data.createdAt);
         }
 
@@ -97,7 +96,7 @@ export default function QuizPlayer({ quizId }: { quizId: string }) {
       } catch (err: any) {
         if (!controller.signal.aborted) {
           console.error(err);
-          setError(err?.message ?? "Unknown error");
+          setError(err?.message ?? 'Unknown error');
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -111,44 +110,47 @@ export default function QuizPlayer({ quizId }: { quizId: string }) {
     };
   }, [quizId]);
 
-  if (loading) return <div className={styles["status-message"]}>Loading…</div>;
-  if (error) return <div className={styles["status-message error"]}>{error}</div>;
-  if (!quiz) return <div className={styles["status-message"]}>Quiz not available.</div>;
+  if (loading) return <div className={styles['status-message']}>Loading…</div>;
+  if (error) return <div className={styles['status-message error']}>{error}</div>;
+  if (!quiz) return <div className={styles['status-message']}>Quiz not available.</div>;
 
   return (
     <div className={styles['quiz-player-container']}>
       <div className={styles['quiz-card']}>
-        <h1 className={styles["quiz-question"]}>{quiz.question}</h1>
+        <h1 className={styles['quiz-question']}>{quiz.question}</h1>
         <div className={styles['quiz-controls']}>
           <div className={styles['points-display']}>
             <span>Punkty</span>
-            <p>{points} / {maxPoints}</p>
+            <p>
+              {points} / {maxPoints}
+            </p>
           </div>
-          {!showResults &&
+          {!showResults && (
             <button className={styles['give-up-btn']} onClick={handleGiveUp}>
               Poddaj się
             </button>
-          }
+          )}
         </div>
         {!showResults ? (
           <input
             type="text"
             placeholder="Wpisz odpowiedź..."
             onChange={handleAnswerChange}
-            className={styles["quiz-input"]}
+            className={styles['quiz-input']}
             autoFocus
           />
         ) : (
           <div className={styles['results']}>
             <h2>Koniec!</h2>
-            <p>Twój ostateczny wynik to {points} na {maxPoints} punktów.</p>
+            <p>
+              Twój ostateczny wynik to {points} na {maxPoints} punktów.
+            </p>
           </div>
-        )
-        }
+        )}
 
         <div className={styles['table-wrapper']}>
-          <table className={styles["quiz-table"]}>
-            {quiz.type === "matchingQuiz" && quiz.headers && (
+          <table className={styles['quiz-table']}>
+            {quiz.type === 'matchingQuiz' && quiz.headers && (
               <thead>
                 <tr>
                   <th>{quiz.headers[0]}</th>
@@ -159,11 +161,13 @@ export default function QuizPlayer({ quizId }: { quizId: string }) {
             <tbody>
               {quiz.answers.map((_, index) => (
                 <tr key={index}>
-                  {quiz.type === "matchingQuiz" && quiz.keys ? (
+                  {quiz.type === 'matchingQuiz' && quiz.keys ? (
                     <td className={styles['key-cell']}>{quiz.keys[index]}</td>
                   ) : null}
                   <td
-                    ref={el => { answersTdRef.current[index] = el; }}
+                    ref={(el) => {
+                      answersTdRef.current[index] = el;
+                    }}
                     className={styles['answer-cell']}
                   >
                     {/* The blank space is intentional */}

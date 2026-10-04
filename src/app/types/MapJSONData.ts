@@ -1,2 +1,2 @@
-type MapJSONData = Record<string, string>;  
+type MapJSONData = Record<string, string>;
 export default MapJSONData;

@@ -1,22 +1,17 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Nabla } from "next/font/google";
-import "./globals.css";
-import styles from './page.module.css'
+import type { Metadata } from 'next';
+import { Geist } from 'next/font/google';
+import './globals.css';
+
+import NavBar from './NavBar';
+
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-import NavBar from "./NavBar";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin', 'latin-ext'],
 });
 
 export const metadata: Metadata = {
-  title: "quizlo",
-  description: "Quizy z wiedzy ogólnej i geografii: wpisywanie odpowiedzi, parowanie i mapy."
+  title: 'quizlo',
+  description: 'Quizy z wiedzy ogólnej i geografii: wpisywanie odpowiedzi, parowanie i mapy.',
 };
 
 export default function RootLayout({
@@ -26,11 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={geistSans.variable}>
         <NavBar />
-        <main>  
-          {children}
-        </main>
+        <main>{children}</main>
       </body>
     </html>
   );

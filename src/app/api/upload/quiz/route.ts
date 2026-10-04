@@ -19,7 +19,9 @@ const preparedJsonSchema = z
         z
           .string()
           .min(1, { message: 'Answer must not be empty.' })
-          .max(maxInputLength, { message: `Answer must be less than ${maxInputLength} characters.` })
+          .max(maxInputLength, {
+            message: `Answer must be less than ${maxInputLength} characters.`,
+          }),
       )
       .min(1, { message: 'Answers array must contain at least one item.' }),
     keys: z
@@ -27,7 +29,7 @@ const preparedJsonSchema = z
         z
           .string()
           .min(1, { message: 'Key must not be empty.' })
-          .max(maxInputLength, { message: `Key must be less than ${maxInputLength} characters.` })
+          .max(maxInputLength, { message: `Key must be less than ${maxInputLength} characters.` }),
       )
       .optional(),
     headers: z
@@ -35,7 +37,9 @@ const preparedJsonSchema = z
         z
           .string()
           .min(1, { message: 'Header must not be empty.' })
-          .max(maxInputLength, { message: `Header must be less than ${maxInputLength} characters.` })
+          .max(maxInputLength, {
+            message: `Header must be less than ${maxInputLength} characters.`,
+          }),
       )
       .optional(),
   })
@@ -47,7 +51,7 @@ const preparedJsonSchema = z
     {
       message: 'Keys are required and must match the number of answers for matching quizzes.',
       path: ['keys'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -57,7 +61,7 @@ const preparedJsonSchema = z
     {
       message: 'Headers are required and must contain exactly two items for matching quizzes.',
       path: ['headers'],
-    }
+    },
   );
 
 const nameSchema = z
@@ -65,16 +69,22 @@ const nameSchema = z
   .min(1, { message: 'Name must not be empty.' })
   .max(50, { message: 'Name must be less than 50 characters long.' });
 
-const maxJsonFileSizeKB = process.env.MAX_JSON_FILE_SIZE_KB ? parseInt(process.env.MAX_JSON_FILE_SIZE_KB) : 128;
+const maxJsonFileSizeKB = process.env.MAX_JSON_FILE_SIZE_KB
+  ? parseInt(process.env.MAX_JSON_FILE_SIZE_KB)
+  : 128;
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const quizDataRaw = formData.get('quizData');
   const name = formData.get('name');
 
-  const quizDataRawSize = typeof quizDataRaw === 'string' ? new TextEncoder().encode(quizDataRaw).length : 0;
+  const quizDataRawSize =
+    typeof quizDataRaw === 'string' ? new TextEncoder().encode(quizDataRaw).length : 0;
   if (quizDataRawSize > maxJsonFileSizeKB * 1024) {
-    return NextResponse.json({ error: `JSON file size exceeds the limit of ${maxJsonFileSizeKB} KB.` }, { status: 400 });
+    return NextResponse.json(
+      { error: `JSON file size exceeds the limit of ${maxJsonFileSizeKB} KB.` },
+      { status: 400 },
+    );
   }
 
   if (!name || typeof name !== 'string') {
@@ -105,12 +115,17 @@ export async function POST(req: NextRequest) {
   if (!validatedJSON.success) {
     return NextResponse.json(
       { error: validatedJSON.error.issues.map((issue) => issue.message) },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const { type, ...quizDataWithoutType } = validatedJSON.data;
-  await addQuizRecordFirestore(type, nameValidation.data, JSON.stringify(quizDataWithoutType), undefined);
+  await addQuizRecordFirestore(
+    type,
+    nameValidation.data,
+    JSON.stringify(quizDataWithoutType),
+    undefined,
+  );
 
   return NextResponse.json({ status: 200 });
 }
