@@ -1,156 +1,82 @@
-'server-only';
+import 'server-only';
 
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
-import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { FieldPath, FieldValue, getFirestore } from 'firebase-admin/firestore';
 
-import type QuizType from '@/app/types/QuizType';
-import FetchedGameData from '../types/FetchedGameData';
+import type { GameRecord, GameSummary, GameType } from '@/app/types/game';
 
-// Only initialize once (for server-side)
-if (!getApps().length) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
+// Firestore auto-generated ids and the seed ids both fit this pattern. Anything else (for example
+// a decoded "a/b") would make the SDK throw on an invalid document path.
+const GAME_ID_PATTERN = /^[\w-]{1,128}$/;
+
+// Initialized on first use, so importing this module during `next build` needs no credentials.
+function getGames() {
+  if (getApps().length === 0) {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      }),
+    });
+  }
+  return getFirestore().collection('quizzes');
 }
 
-const firestoreDb = getFirestore();
-
-/**
- * Add a quiz record to Firestore (backend only)
- * @param type 'map' | 'quiz' | 'matchingQuiz'
- * @param name string
- * @param filename string
- * @param jsonData any
- * @param svgData string | undefined
- */
-async function addQuizRecordFirestore(
-  type: QuizType,
+export async function addGame(
+  type: GameType,
   name: string,
-  jsonData: any,
-  svgData?: string,
-) {
-  try {
-    const docRef = await firestoreDb.collection('quizzes').add({
-      type,
-      name,
-      jsonData,
-      svgData: svgData || null,
-      createdAt: new Date(),
-      viewCount: 0,
-    });
-    return docRef.id;
-  } catch (error) {
-    console.error('Error inserting quiz record to Firestore:', error);
-    throw error;
-  }
+  jsonData: string,
+  svgData: string | null = null,
+): Promise<string> {
+  const docRef = await getGames().add({
+    type,
+    name,
+    jsonData,
+    svgData,
+    createdAt: new Date(),
+    viewCount: 0,
+  });
+  return docRef.id;
 }
 
-/**
- * Get all quiz names from Firestore (backend only)
- * @returns Array of quiz ids with names
- */
-async function getQuizzesIdsWithNames(): Promise<{ id: string; name: string }[]> {
-  try {
-    const snapshot = await firestoreDb.collection('quizzes').get();
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      name: doc.data().name,
-    }));
-  } catch (error) {
-    console.error('Error fetching quiz names from Firestore:', error);
-    throw error;
-  }
+export async function getGameSummaries(): Promise<GameSummary[]> {
+  const snapshot = await getGames().select('name').get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, name: doc.get('name') }));
 }
 
-/**
- * Get popular quizzes from Firestore (backend only)
- * @returns Array of popular quizzes
- */
-async function getPopularQuizzes(
-  limit: number = 3,
-): Promise<{ id: string; name: string }[] | null> {
-  try {
-    const snapshot = await firestoreDb
-      .collection('quizzes')
-      .orderBy('viewCount', 'desc')
-      .limit(limit)
-      .get();
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      name: doc.data().name,
-    }));
-  } catch (error) {
-    console.error('Error fetching popular quizzes from Firestore:', error);
-    throw error;
-  }
+export async function getPopularGames(limit = 3): Promise<GameSummary[]> {
+  const snapshot = await getGames().orderBy('viewCount', 'desc').limit(limit).select('name').get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, name: doc.get('name') }));
 }
 
-/**
- * Increment view count for a quiz in Firestore (backend only)
- * @param quizId string
- */
-async function incrementQuizViewCount(quizId: string) {
-  try {
-    const quizRef = firestoreDb.collection('quizzes').doc(quizId);
-    await quizRef.update({
-      viewCount: FieldValue.increment(1),
-    });
-  } catch (error) {
-    console.error('Error incrementing view count:', error);
-    throw error;
-  }
+export async function incrementGameViewCount(gameId: string): Promise<void> {
+  await getGames()
+    .doc(gameId)
+    .update({ viewCount: FieldValue.increment(1) });
 }
 
-/**
- * Get game by ID from Firestore (backend only)
- * @param gameId string
- * @returns gameData FetchedGameData | null
- */
-async function getGameById(gameId: string): Promise<FetchedGameData | null> {
-  try {
-    const quizRef = firestoreDb.collection('quizzes').doc(gameId);
-    const doc = await quizRef.get();
-    if (doc.exists) {
-      return doc.data() as FetchedGameData;
-    } else {
-      throw new Error('Quiz not found');
-    }
-  } catch (error) {
-    console.error('Error fetching quiz by ID:', error);
-    throw error;
-  }
+export async function getGameById(gameId: string): Promise<GameRecord | null> {
+  if (!GAME_ID_PATTERN.test(gameId)) return null;
+
+  const doc = await getGames().doc(gameId).get();
+  if (!doc.exists) return null;
+
+  return {
+    type: doc.get('type'),
+    name: doc.get('name'),
+    jsonData: doc.get('jsonData'),
+    svgData: doc.get('svgData') ?? null,
+  };
 }
 
-/**
- * Get quiz type by ID from Firestore (backend only)
- * @param quizId string
- * @returns Quiz type
- */
-async function getQuizTypeById(quizId: string): Promise<QuizType | null> {
-  try {
-    const quizRef = firestoreDb.collection('quizzes').doc(quizId);
-    const doc = await quizRef.get();
-    if (doc.exists) {
-      const data = doc.data();
-      return data?.type || null;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching quiz type by ID:', error);
-    throw error;
-  }
-}
+export async function getGameTypeById(gameId: string): Promise<GameType | null> {
+  if (!GAME_ID_PATTERN.test(gameId)) return null;
 
-export {
-  addQuizRecordFirestore,
-  getQuizzesIdsWithNames,
-  getPopularQuizzes,
-  incrementQuizViewCount,
-  getGameById,
-  getQuizTypeById,
-};
+  const snapshot = await getGames()
+    .where(FieldPath.documentId(), '==', gameId)
+    .select('type')
+    .limit(1)
+    .get();
+  return snapshot.empty ? null : snapshot.docs[0].get('type');
+}

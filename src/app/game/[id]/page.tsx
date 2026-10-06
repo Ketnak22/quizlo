@@ -1,37 +1,21 @@
-// Retrieve the quiz type first to decide which component to render
-
-import { incrementQuizViewCount, getQuizTypeById } from '@/app/lib/firebase';
 import { notFound } from 'next/navigation';
+
+import { getGameTypeById, incrementGameViewCount } from '@/app/lib/firebase';
+import MapPlayer from './MapPlayer';
 import QuizPlayer from './QuizPlayer';
 
-import QuizType from '@/app/types/QuizType';
-import MapPlayer from './MapPlayer';
-
-let quizType: QuizType | null = null;
-
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  try {
-    const result = await getQuizTypeById(id);
-    if (!result) return notFound();
+  const gameType = await getGameTypeById(id);
+  if (!gameType) notFound();
 
-    quizType = result;
-  } catch (err) {
-    console.error('Error fetching quiz for existence check:', err);
-    return notFound();
-  }
-
+  // A failed view count must not block the game itself.
   try {
-    await incrementQuizViewCount(id);
+    await incrementGameViewCount(id);
   } catch (err) {
     console.error('Error incrementing view count:', err);
   }
 
-  return (
-    <>
-      {(quizType === 'quiz' || quizType === 'matchingQuiz') && <QuizPlayer quizId={id} />}
-      {quizType === 'map' && <MapPlayer mapId={id} />}
-    </>
-  );
+  return gameType === 'map' ? <MapPlayer mapId={id} /> : <QuizPlayer quizId={id} />;
 }

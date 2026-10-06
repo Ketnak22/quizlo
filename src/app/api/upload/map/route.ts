@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { JSDOM } from 'jsdom';
 import createDOMPurify from 'dompurify';
-import { addQuizRecordFirestore } from '@/app/lib/firebase';
+import { addGame } from '@/app/lib/firebase';
 
 // Set up DOMPurify with JSDOM
 const window = new JSDOM('').window;
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Add record to Firestore
-    await addQuizRecordFirestore(
+    await addGame(
       'map',
       nameData,
       JSON.stringify(jsonValidation.data),

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { addQuizRecordFirestore } from '@/app/lib/firebase';
+import { addGame } from '@/app/lib/firebase';
 
 // Zod schema for validating the quiz JSON structure
 const maxInputLength = process.env.MAX_INPUT_LENGTH ? parseInt(process.env.MAX_INPUT_LENGTH) : 50;
@@ -120,11 +120,10 @@ export async function POST(req: NextRequest) {
   }
 
   const { type, ...quizDataWithoutType } = validatedJSON.data;
-  await addQuizRecordFirestore(
+  await addGame(
     type,
     nameValidation.data,
     JSON.stringify(quizDataWithoutType),
-    undefined,
   );
 
   return NextResponse.json({ status: 200 });
