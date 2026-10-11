@@ -30,7 +30,10 @@ export function createRateLimiter(
     }
 
     if (window.count >= maxRequests) {
-      return { allowed: false, retryAfterSeconds: Math.ceil((window.resetAt - currentTime) / 1000) };
+      return {
+        allowed: false,
+        retryAfterSeconds: Math.ceil((window.resetAt - currentTime) / 1000),
+      };
     }
 
     window.count += 1;

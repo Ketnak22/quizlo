@@ -1,0 +1,17 @@
+.notice {
+  width: calc(100% - 2rem);
+  max-width: 480px;
+  margin: 4rem auto;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.notice h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.notice p {
+  margin: 0 0 1.5rem;
+  color: var(--color-muted);
+}

@@ -4,9 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { pl } from '@/app/i18n/pl';
 import { isValidAdminToken } from './adminToken';
+import { ADMIN_TOKEN_HEADER } from './config';
 import { createRateLimiter } from './rateLimit';
-
-export const ADMIN_TOKEN_HEADER = 'x-admin-token';
 
 const checkRateLimit = createRateLimiter({ maxRequests: 10, windowMs: 60_000 });
 

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { pl } from '@/app/i18n/pl';
 import styles from './NavBar.module.css';
 
 export default function NavBar() {
@@ -8,14 +9,14 @@ export default function NavBar() {
     <header className={styles.header}>
       <div className={styles.headerContainer}>
         <Link href="/" className={styles.logoLink}>
-          <Image src="/logo.svg" width={126} height={44} alt="quizlo" priority />
+          <Image src="/logo.svg" width={126} height={44} alt={pl.nav.logoAlt} priority />
         </Link>
-        <nav className={styles.navContainer}>
-          <Link href="/create/quiz" className={styles.navButton}>
-            Stwórz quiz
+        <nav className={styles.nav}>
+          <Link href="/create/quiz" className="btn btnPrimary">
+            {pl.nav.createQuiz}
           </Link>
-          <Link href="/create/map" className={styles.navButton}>
-            Prześlij mapę
+          <Link href="/create/map" className="btn btnPrimary">
+            {pl.nav.uploadMap}
           </Link>
         </nav>
       </div>

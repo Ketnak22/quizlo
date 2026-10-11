@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Geist } from 'next/font/google';
 import './globals.css';
 
-import NavBar from './NavBar';
+import NavBar from './components/NavBar';
+import { pl } from './i18n/pl';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -10,8 +11,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: 'quizlo',
-  description: 'Quizy z wiedzy ogólnej i geografii: wpisywanie odpowiedzi, parowanie i mapy.',
+  title: pl.meta.title,
+  description: pl.meta.description,
 };
 
 export default function RootLayout({

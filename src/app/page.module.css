@@ -1,89 +1,92 @@
 .mainContent {
   width: 90%;
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 2.5rem auto;
 }
 
 .contentWrapper {
   display: flex;
-  gap: 40px;
+  gap: 2.5rem;
 }
 
 .quizListSection {
   flex: 3;
+  min-width: 0;
 }
 
 .titleHolder h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: #222;
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
 }
 
 .titleHolder h2 {
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 2px solid var(--color-border);
   font-size: 1.5rem;
-  color: #555;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
+  color: var(--color-muted);
 }
 
-.quizList {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+.quizList,
+.popularQuizzesSidebar,
+.about {
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.quizList p {
+  margin: 0;
 }
 
 .popularQuizzesSidebar {
   flex: 1;
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   height: fit-content;
 }
 
-.popularQuizzesSidebar h3 {
-  margin-top: 0;
-  font-size: 1.2rem;
-  color: #333;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
+.popularQuizzesSidebar h3,
+.about h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
 }
 
 .popularQuizzesSidebar ul {
-  list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.popularQuizzesSidebar li {
-  margin-bottom: 12px;
+.popularQuizzesSidebar li + li {
+  margin-top: 0.75rem;
 }
 
-.popularQuizzesSidebar li a {
-  text-decoration: none;
-  color: #007bff;
+.popularQuizzesSidebar a,
+.about a {
   font-weight: 500;
-  transition: color 0.2s;
+  color: var(--color-primary);
 }
 
-.popularQuizzesSidebar li a:hover {
-  color: #0056b3;
-  text-decoration: underline;
+.about {
+  margin-top: 2.5rem;
 }
 
-.quizElementContainer {
-  margin-bottom: 20px;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  padding: 15px;
-  transition:
-    box-shadow 0.2s,
-    border-color 0.2s;
+.about p {
+  margin: 0 0 0.75rem;
+  color: var(--color-muted);
 }
 
-.quizElementContainer:hover {
-  border-color: #28a745;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+@media (max-width: 768px) {
+  .mainContent {
+    margin: 1.5rem auto;
+  }
+
+  .contentWrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .about {
+    margin-top: 1.5rem;
+  }
 }

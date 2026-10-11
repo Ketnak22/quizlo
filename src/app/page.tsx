@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
+import QuizSelector from './components/QuizSelector';
 import { pl } from './i18n/pl';
 import { REPO_URL } from './lib/config';
 import { getGameSummaries, getPopularGames } from './lib/firebase';
 import styles from './page.module.css';
-import QuizSelector from './QuizSelector';
 
 // The list comes from Firestore and must stay fresh, so never prerender this page at build time.
 export const dynamic = 'force-dynamic';
