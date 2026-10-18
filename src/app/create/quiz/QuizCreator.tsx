@@ -68,19 +68,18 @@ export default function QuizCreator({ uploadsEnabled }: { uploadsEnabled: boolea
 
       <AdminAccess uploadsEnabled={uploadsEnabled} token={token} onTokenChange={setToken} />
 
-      <label className={styles.field}>
-        <span>{pl.quizCreator.questionLabel}</span>
-        <input
-          type="text"
-          placeholder={pl.quizCreator.questionPlaceholder}
-          value={question}
-          maxLength={MAX_INPUT_LENGTH}
-          onChange={(e) => setQuestion(e.target.value)}
-        />
-      </label>
+      <input
+        type="text"
+        className={styles.questionInput}
+        aria-label={pl.quizCreator.questionLabel}
+        placeholder={pl.quizCreator.questionPlaceholder}
+        value={question}
+        maxLength={MAX_INPUT_LENGTH}
+        onChange={(e) => setQuestion(e.target.value)}
+      />
 
-      <label className={styles.field}>
-        <span>{pl.quizCreator.typeLabel}</span>
+      <label className={styles.typeRow}>
+        <span>{pl.quizCreator.typeLabel}:</span>
         <select value={type} onChange={(e) => setType(e.target.value as QuizFormType)}>
           <option value="quiz">{pl.quizCreator.typeQuiz}</option>
           <option value="matchingQuiz">{pl.quizCreator.typeMatching}</option>
@@ -88,7 +87,7 @@ export default function QuizCreator({ uploadsEnabled }: { uploadsEnabled: boolea
       </label>
 
       {isMatching && (
-        <div className={styles.fieldRow}>
+        <div className={styles.headerRow}>
           <input
             type="text"
             aria-label={pl.quizCreator.keyHeaderPlaceholder}
@@ -132,12 +131,12 @@ export default function QuizCreator({ uploadsEnabled }: { uploadsEnabled: boolea
             />
             <button
               type="button"
-              className={`btn btnDanger ${styles.iconButton}`}
+              className={styles.removeButton}
               aria-label={pl.quizCreator.removeRow}
               disabled={rows.length === 1}
               onClick={() => setRows((prev) => prev.filter((_, idx) => idx !== index))}
             >
-              ✕
+              X
             </button>
           </div>
         ))}
@@ -145,10 +144,11 @@ export default function QuizCreator({ uploadsEnabled }: { uploadsEnabled: boolea
 
       <button
         type="button"
-        className={`btn btnSecondary ${styles.addButton}`}
+        className={styles.plusButton}
+        aria-label={pl.quizCreator.addRow}
         onClick={() => setRows((prev) => [...prev, EMPTY_ROW])}
       >
-        + {pl.quizCreator.addRow}
+        +
       </button>
 
       {error && (
@@ -157,15 +157,13 @@ export default function QuizCreator({ uploadsEnabled }: { uploadsEnabled: boolea
         </p>
       )}
 
-      <div className={styles.submitRow}>
-        <button
-          type="submit"
-          className="btn btnPrimary"
-          disabled={!uploadsEnabled || token === '' || isSending}
-        >
-          {isSending ? pl.creator.sending : pl.creator.send}
-        </button>
-      </div>
+      <button
+        type="submit"
+        className="btn btnSecondary"
+        disabled={!uploadsEnabled || token === '' || isSending}
+      >
+        {isSending ? pl.creator.sending : pl.creator.send}
+      </button>
     </form>
   );
 }

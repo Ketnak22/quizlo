@@ -80,7 +80,7 @@ function MapBoard({ map }: { map: MapGame }) {
   return (
     <div className={styles.board}>
       <h1 className={styles.title}>{map.name}</h1>
-      <GamePanel game={game} />
+      <GamePanel game={game} variant="map" />
 
       <div
         ref={svgContainerRef}

@@ -152,7 +152,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
   };
 
   return (
-    <div className={`card ${styles.creator} ${svg ? styles.creatorWide : ''}`}>
+    <div className={styles.mapCreator}>
       <h1 className={styles.title}>{pl.mapCreator.title}</h1>
 
       <AdminAccess uploadsEnabled={uploadsEnabled} token={token} onTokenChange={setToken} />
@@ -185,7 +185,11 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
           />
 
           <div className={styles.mapPanel}>
-            <button type="button" className="btn btnSecondary" onClick={toggleAllRegions}>
+            <button
+              type="button"
+              className={`${areAllExcluded ? styles.restoreButton : styles.removeButton} ${styles.toggleAll}`}
+              onClick={toggleAllRegions}
+            >
               {areAllExcluded ? pl.mapCreator.includeAll : pl.mapCreator.excludeAll}
             </button>
 
@@ -212,7 +216,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
                   />
                   <button
                     type="button"
-                    className={`btn ${region.isExcluded ? 'btnSecondary' : 'btnDanger'} ${styles.iconButton}`}
+                    className={region.isExcluded ? styles.restoreButton : styles.removeButton}
                     aria-label={
                       region.isExcluded ? pl.mapCreator.includeRegion : pl.mapCreator.excludeRegion
                     }
@@ -220,22 +224,30 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
                       updateRegion(index, { isExcluded: !region.isExcluded, customName: '' })
                     }
                   >
-                    {region.isExcluded ? '↺' : '✕'}
+                    {region.isExcluded ? '↺' : 'X'}
                   </button>
                 </div>
               ))}
             </div>
 
-            <label className={styles.field}>
-              <span>{pl.mapCreator.nameLabel}</span>
+            <div className={styles.mapSubmitRow}>
               <input
                 type="text"
+                aria-label={pl.mapCreator.nameLabel}
                 placeholder={pl.mapCreator.namePlaceholder}
                 value={mapName}
                 maxLength={MAX_INPUT_LENGTH}
                 onChange={(e) => setMapName(e.target.value)}
               />
-            </label>
+              <button
+                type="button"
+                className="btn btnSecondary"
+                disabled={!uploadsEnabled || token === '' || isSending}
+                onClick={handleUpload}
+              >
+                {isSending ? pl.creator.sending : pl.creator.send}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -244,19 +256,6 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
         <p className={styles.error} role="alert">
           {error}
         </p>
-      )}
-
-      {svg && (
-        <div className={styles.submitRow}>
-          <button
-            type="button"
-            className="btn btnPrimary"
-            disabled={!uploadsEnabled || token === '' || isSending}
-            onClick={handleUpload}
-          >
-            {isSending ? pl.creator.sending : pl.creator.send}
-          </button>
-        </div>
       )}
     </div>
   );

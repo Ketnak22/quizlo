@@ -1,26 +1,55 @@
 .board {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.quizBoard {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.quizCard {
   width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  max-width: 700px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .title {
   margin: 0;
-  font-size: clamp(1.5rem, 5vw, 2.25rem);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
   font-weight: 700;
   text-align: center;
+  color: var(--color-heading);
   overflow-wrap: anywhere;
+}
+
+.quizCard .title {
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
 }
 
 .panel {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  padding: 1rem;
+  box-shadow: var(--shadow-raised);
+}
+
+.quizControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 1rem;
-  padding: 1.25rem;
+  margin-bottom: 2rem;
 }
 
 .points {
@@ -28,7 +57,7 @@
 }
 
 .points span {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -38,25 +67,40 @@
   margin: 0.25rem 0 0;
   font-size: 2rem;
   font-weight: 700;
+  color: var(--color-heading);
 }
 
 .answerRow {
   display: flex;
-  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
 }
 
 .answerRow input {
   flex: 1;
   min-width: 0;
+  height: 45px;
+}
+
+.quizInput {
+  height: 50px;
+  margin-bottom: 2rem;
+  font-size: 1.1rem !important;
+  text-align: center;
 }
 
 .results {
+  width: 100%;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
 .results h2 {
   margin: 0 0 0.5rem;
   font-size: 1.5rem;
+  color: var(--color-heading);
 }
 
 .results p {
@@ -75,17 +119,22 @@
 
 .table th,
 .table td {
-  padding: 0.75rem 1rem;
+  padding: 12px 16px;
   text-align: center;
+  vertical-align: middle;
   border: 1px solid var(--color-border);
 }
 
 .table th {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  background-color: var(--color-surface-alt);
+}
+
+.table tbody tr:nth-child(even) {
   background-color: var(--color-surface-alt);
 }
 
@@ -96,21 +145,23 @@
 .answerCell {
   height: 48px;
   font-weight: 500;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.4s ease;
 }
 
-.correct {
+.table .correct {
   color: var(--color-success-text);
   background-color: var(--color-success-soft);
 }
 
-.missed {
+.table .missed {
   color: var(--color-danger);
-  background-color: var(--color-danger-soft);
 }
 
 .map {
+  width: 100%;
+  max-width: 800px;
   padding: 1rem;
+  box-shadow: var(--shadow-raised);
 }
 
 .map svg {
@@ -126,23 +177,42 @@
 .tooltip {
   position: fixed;
   z-index: 10;
-  padding: 0.5rem 0.75rem;
+  padding: 8px 12px;
   border-radius: var(--radius);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: #fff;
   background-color: rgba(28, 30, 33, 0.9);
-  box-shadow: var(--shadow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   pointer-events: none;
-  transform: translate(-50%, -130%);
+  transform: translate(-50%, -120%);
 }
 
 @media (max-width: 480px) {
+  .board,
+  .quizBoard {
+    padding: 1rem 0.75rem;
+  }
+
   .board {
-    padding: 1.25rem 0.75rem;
+    gap: 1.25rem;
+  }
+
+  .quizCard {
+    padding: 1.25rem 1rem;
   }
 
   .answerRow {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .answerRow input {
+    flex: none;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 8px;
   }
 }

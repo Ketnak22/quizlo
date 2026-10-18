@@ -30,40 +30,42 @@ function QuizBoard({ quiz }: { quiz: QuizContent }) {
   const { keys, headers } = quiz;
 
   return (
-    <div className={styles.board}>
-      <h1 className={styles.title}>{quiz.question}</h1>
-      <GamePanel game={game} />
+    <div className={styles.quizBoard}>
+      <div className={`card ${styles.quizCard}`}>
+        <h1 className={styles.title}>{quiz.question}</h1>
+        <GamePanel game={game} variant="quiz" />
 
-      <div className={`card ${styles.tableWrapper}`}>
-        <table className={styles.table}>
-          {headers && (
-            <thead>
-              <tr>
-                <th>{headers[0]}</th>
-                <th>{headers[1]}</th>
-              </tr>
-            </thead>
-          )}
-          <tbody>
-            {quiz.answers.map((answer, index) => {
-              const isGuessed = game.guessed.has(index);
-              const isRevealed = isGuessed || game.isFinished;
-
-              return (
-                <tr key={index}>
-                  {keys && <td className={styles.keyCell}>{keys[index]}</td>}
-                  <td
-                    className={`${styles.answerCell} ${isGuessed ? styles.correct : ''} ${
-                      isRevealed && !isGuessed ? styles.missed : ''
-                    }`}
-                  >
-                    {isRevealed ? answer : ''}
-                  </td>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            {headers && (
+              <thead>
+                <tr>
+                  <th>{headers[0]}</th>
+                  <th>{headers[1]}</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              </thead>
+            )}
+            <tbody>
+              {quiz.answers.map((answer, index) => {
+                const isGuessed = game.guessed.has(index);
+                const isRevealed = isGuessed || game.isFinished;
+
+                return (
+                  <tr key={index}>
+                    {keys && <td className={styles.keyCell}>{keys[index]}</td>}
+                    <td
+                      className={`${styles.answerCell} ${isGuessed ? styles.correct : ''} ${
+                        isRevealed && !isGuessed ? styles.missed : ''
+                      }`}
+                    >
+                      {isRevealed ? answer : ''}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
