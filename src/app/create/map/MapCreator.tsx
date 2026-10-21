@@ -26,7 +26,8 @@ interface LoadedSvg {
 }
 
 const REGION_SELECTOR = 'path[id]';
-const HIGHLIGHT_FILL = '#ffe5b4';
+const HOVER_FILL = '#ffe5b4';
+const SELECTED_FILL = 'var(--color-primary)';
 
 export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean }) {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
   const [svg, setSvg] = useState<LoadedSvg | null>(null);
   const [regions, setRegions] = useState<Region[]>([]);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [mapName, setMapName] = useState('');
   const [token, setToken] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +91,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
     setSvg(null);
     setRegions([]);
     setHoveredIndex(null);
+    setSelectedIndex(null);
     setError(null);
   };
 
@@ -98,10 +101,12 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
       const region = regions[index];
       if (!region) return;
 
-      path.style.fill = hoveredIndex === index ? HIGHLIGHT_FILL : region.originalFill;
+      if (selectedIndex === index) path.style.fill = SELECTED_FILL;
+      else if (hoveredIndex === index) path.style.fill = HOVER_FILL;
+      else path.style.fill = region.originalFill;
       path.style.opacity = region.isExcluded ? '0.3' : '';
     });
-  }, [hoveredIndex, regions]);
+  }, [hoveredIndex, selectedIndex, regions]);
 
   const getRegionIndex = (target: EventTarget) => {
     const paths = previewRef.current?.querySelectorAll(REGION_SELECTOR) ?? [];
@@ -114,7 +119,11 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
   };
 
   const handlePreviewClick = (e: MouseEvent<HTMLDivElement>) => {
-    inputRefs.current[getRegionIndex(e.target)]?.focus();
+    const index = getRegionIndex(e.target);
+    if (index === -1) return;
+
+    setSelectedIndex(index);
+    inputRefs.current[index]?.focus();
   };
 
   const updateRegion = (index: number, change: Partial<Region>) => {
@@ -258,7 +267,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
                       inputRefs.current[index] = el;
                     }}
                     onChange={(e) => updateRegion(index, { customName: e.target.value })}
-                    onFocus={() => setHoveredIndex(index)}
+                    onFocus={() => setSelectedIndex(index)}
                   />
                   <button
                     type="button"
