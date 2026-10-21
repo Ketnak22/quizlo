@@ -60,6 +60,14 @@ export const pl = {
   mapCreator: {
     title: 'Prześlij mapę',
     dropzone: 'Przeciągnij i upuść plik SVG tutaj lub kliknij, aby wybrać plik',
+    demoMapsTitle: 'Albo wybierz przykładową mapę, aby wypróbować kreator:',
+    demoMaps: {
+      continents: 'Kontynenty',
+      voivodeships: 'Województwa Polski',
+      southAmerica: 'Ameryka Południowa',
+    },
+    demoMapLoadFailed: 'Nie udało się wczytać przykładowej mapy. Spróbuj ponownie.',
+    changeMap: 'Wybierz inną mapę',
     invalidFile: (maxKb: number) => `Wybierz poprawny plik SVG, który ma najwyżej ${maxKb} KB.`,
     noRegions: 'Plik SVG nie zawiera żadnych ścieżek z atrybutem id.',
     excludeAll: 'Wyłącz wszystko',

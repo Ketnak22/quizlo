@@ -144,7 +144,7 @@ The build does not connect to Firebase, so it works without credentials. The rat
 
 ## Map data
 
-The sample maps are made from [Natural Earth](https://www.naturalearthdata.com/) data, which is in the public domain. See [scripts/seed-data/README.md](scripts/seed-data/README.md).
+The sample maps, including the ones offered by the map creator in demo mode (`public/demo-maps`, listed in `src/app/create/map/demoMaps.ts`), are made from [Natural Earth](https://www.naturalearthdata.com/) data, which is in the public domain. See [scripts/seed-data/README.md](scripts/seed-data/README.md).
 
 ## License
 

@@ -174,6 +174,21 @@
   outline: none;
 }
 
+.demoMaps {
+  text-align: center;
+}
+
+.demoMaps p {
+  margin: 0 0 10px;
+}
+
+.demoMapList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
 .mapLayout {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);

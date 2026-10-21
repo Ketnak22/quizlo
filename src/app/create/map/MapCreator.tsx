@@ -11,6 +11,7 @@ import { mapContentSchema, nameSchema } from '@/app/lib/schemas';
 import AdminAccess from '../AdminAccess';
 import styles from '../creator.module.css';
 import { submitUpload } from '../submitUpload';
+import { DEMO_MAPS } from './demoMaps';
 
 interface Region {
   id: string;
@@ -41,14 +42,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
 
-  const handleDrop = async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (!file) {
-      setError(pl.mapCreator.invalidFile(MAX_SVG_FILE_SIZE_KB));
-      return;
-    }
-
-    const original = await file.text();
+  const loadSvg = (original: string) => {
     const sanitized = DOMPurify.sanitize(original, { USE_PROFILES: { svg: true } });
     const doc = new DOMParser().parseFromString(sanitized, 'text/html');
     const paths = Array.from(doc.querySelectorAll<SVGPathElement>(REGION_SELECTOR));
@@ -68,6 +62,34 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
         isExcluded: false,
       })),
     );
+  };
+
+  const handleDrop = async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) {
+      setError(pl.mapCreator.invalidFile(MAX_SVG_FILE_SIZE_KB));
+      return;
+    }
+
+    loadSvg(await file.text());
+  };
+
+  const handleDemoMapSelect = async (file: string) => {
+    try {
+      const res = await fetch(file);
+      if (!res.ok) throw new Error(`Unexpected status ${res.status}`);
+      loadSvg(await res.text());
+    } catch (err) {
+      console.error('Failed to load demo map:', err);
+      setError(pl.mapCreator.demoMapLoadFailed);
+    }
+  };
+
+  const handleChangeMap = () => {
+    setSvg(null);
+    setRegions([]);
+    setHoveredIndex(null);
+    setError(null);
   };
 
   // The preview is rendered once as raw HTML, so the highlight is applied directly to its paths.
@@ -171,6 +193,30 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
             </div>
           )}
         </Dropzone>
+      )}
+
+      {!svg && !uploadsEnabled && (
+        <div className={styles.demoMaps}>
+          <p>{pl.mapCreator.demoMapsTitle}</p>
+          <div className={styles.demoMapList}>
+            {DEMO_MAPS.map((map) => (
+              <button
+                key={map.file}
+                type="button"
+                className="btn btnSecondary"
+                onClick={() => handleDemoMapSelect(map.file)}
+              >
+                {map.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {svg && (
+        <button type="button" className="btn btnSecondary" onClick={handleChangeMap}>
+          {pl.mapCreator.changeMap}
+        </button>
       )}
 
       {svg && (
