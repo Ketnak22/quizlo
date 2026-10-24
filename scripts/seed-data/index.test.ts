@@ -14,7 +14,7 @@ describe('seed games', () => {
     const count = (type: string) => seedGames.filter((game) => game.type === type).length;
     expect(count('quiz')).toBe(2);
     expect(count('matchingQuiz')).toBe(2);
-    expect(count('map')).toBe(2);
+    expect(count('map')).toBe(1);
   });
 
   it.each(seedGames)('$id passes the upload validation', (game) => {
