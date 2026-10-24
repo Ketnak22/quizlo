@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "tsx --env-file=.env scripts/seed.ts"
+    "seed": "tsx --env-file=.env scripts/seed.ts",
+    "backup": "tsx --env-file=.env scripts/backup.ts"
   },
   "dependencies": {
     "dompurify": "^3.4.17",
