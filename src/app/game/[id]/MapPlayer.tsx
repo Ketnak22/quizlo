@@ -6,6 +6,7 @@ import { type MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import StatusMessage from '@/app/components/StatusMessage';
 import { pl } from '@/app/i18n/pl';
 import { type MapContent, mapContentSchema } from '@/app/lib/schemas';
+import { ensureViewBox } from '@/app/lib/svgViewBox';
 import type { GameRecord } from '@/app/types/game';
 import styles from './game.module.css';
 import GamePanel from './GamePanel';
@@ -28,7 +29,7 @@ function parseMap(game: GameRecord): MapGame {
   if (!game.svgData) throw new Error('Map game has no SVG data');
   return {
     name: game.name,
-    svg: DOMPurify.sanitize(game.svgData, { USE_PROFILES: { svg: true } }),
+    svg: ensureViewBox(DOMPurify.sanitize(game.svgData, { USE_PROFILES: { svg: true } })),
     regions: mapContentSchema.parse(JSON.parse(game.jsonData)),
   };
 }

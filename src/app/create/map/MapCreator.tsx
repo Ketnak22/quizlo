@@ -8,6 +8,7 @@ import Dropzone from 'react-dropzone';
 import { pl } from '@/app/i18n/pl';
 import { MAX_INPUT_LENGTH, MAX_SVG_FILE_SIZE_KB } from '@/app/lib/config';
 import { mapContentSchema, nameSchema } from '@/app/lib/schemas';
+import { ensureViewBox } from '@/app/lib/svgViewBox';
 import AdminAccess from '../AdminAccess';
 import styles from '../creator.module.css';
 import { submitUpload } from '../submitUpload';
@@ -45,7 +46,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
   const [isSending, setIsSending] = useState(false);
 
   const loadSvg = (original: string) => {
-    const sanitized = DOMPurify.sanitize(original, { USE_PROFILES: { svg: true } });
+    const sanitized = ensureViewBox(DOMPurify.sanitize(original, { USE_PROFILES: { svg: true } }));
     const doc = new DOMParser().parseFromString(sanitized, 'text/html');
     const paths = Array.from(doc.querySelectorAll<SVGPathElement>(REGION_SELECTOR));
 
