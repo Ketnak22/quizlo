@@ -60,6 +60,9 @@ function MapBoard({ map }: { map: MapGame }) {
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
+  // React replaces the markup whenever this object changes, which would wipe the region colors.
+  const svgHtml = useMemo(() => ({ __html: map.svg }), [map.svg]);
+
   // The SVG markup is rendered once as raw HTML, so region colors are applied directly to its paths.
   useEffect(() => {
     svgContainerRef.current?.querySelectorAll('path').forEach((path) => {
@@ -88,7 +91,7 @@ function MapBoard({ map }: { map: MapGame }) {
         className={`card ${styles.map}`}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setTooltip(null)}
-        dangerouslySetInnerHTML={{ __html: map.svg }}
+        dangerouslySetInnerHTML={svgHtml}
       />
 
       {tooltip && (

@@ -2,7 +2,7 @@
 
 import DOMPurify from 'dompurify';
 import { useRouter } from 'next/navigation';
-import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import { type MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Dropzone from 'react-dropzone';
 
 import { pl } from '@/app/i18n/pl';
@@ -44,6 +44,9 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
   const [token, setToken] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
+
+  // React replaces the markup whenever this object changes, which would wipe the highlight.
+  const previewHtml = useMemo(() => ({ __html: svg?.sanitized ?? '' }), [svg]);
 
   const loadSvg = (original: string) => {
     const sanitized = ensureViewBox(DOMPurify.sanitize(original, { USE_PROFILES: { svg: true } }));
@@ -237,7 +240,7 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
             onMouseOver={handlePreviewHover}
             onMouseLeave={() => setHoveredIndex(null)}
             onClick={handlePreviewClick}
-            dangerouslySetInnerHTML={{ __html: svg.sanitized }}
+            dangerouslySetInnerHTML={previewHtml}
           />
 
           <div className={styles.mapPanel}>
