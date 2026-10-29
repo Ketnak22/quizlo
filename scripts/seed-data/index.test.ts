@@ -5,9 +5,9 @@ import { hasAllPathIds, sanitizeSvg } from '../../src/app/lib/svg';
 import { seedGames } from './index';
 
 describe('seed games', () => {
-  it('has unique ids', () => {
-    const ids = seedGames.map((game) => game.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  it('has unique names', () => {
+    const names = seedGames.map((game) => game.name);
+    expect(new Set(names).size).toBe(names.length);
   });
 
   it('covers every game mode', () => {
@@ -17,7 +17,7 @@ describe('seed games', () => {
     expect(count('map')).toBe(1);
   });
 
-  it.each(seedGames)('$id passes the upload validation', (game) => {
+  it.each(seedGames)('$name passes the upload validation', (game) => {
     expect(nameSchema.safeParse(game.name).success).toBe(true);
 
     if (game.type === 'map') {

@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import type { GameType } from '../../src/app/types/game';
 
 export interface SeedGame {
-  id: string;
   type: GameType;
   name: string;
   /** Serialized the same way the upload endpoints store game content. */
@@ -17,7 +16,6 @@ function readSvg(fileName: string): string {
 
 export const seedGames: SeedGame[] = [
   {
-    id: 'seed-planets',
     type: 'quiz',
     name: 'Wymień planety Układu Słonecznego',
     content: {
@@ -27,7 +25,6 @@ export const seedGames: SeedGame[] = [
     svg: null,
   },
   {
-    id: 'seed-zodiac-signs',
     type: 'quiz',
     name: 'Wymień znaki zodiaku',
     content: {
@@ -50,7 +47,6 @@ export const seedGames: SeedGame[] = [
     svg: null,
   },
   {
-    id: 'seed-chemical-elements',
     type: 'matchingQuiz',
     name: 'Symbole pierwiastków chemicznych',
     content: {
@@ -73,7 +69,6 @@ export const seedGames: SeedGame[] = [
     svg: null,
   },
   {
-    id: 'seed-polish-literature',
     type: 'matchingQuiz',
     name: 'Autorzy polskich książek',
     content: {
@@ -93,7 +88,6 @@ export const seedGames: SeedGame[] = [
     svg: null,
   },
   {
-    id: 'seed-continents',
     type: 'map',
     name: 'Kontynenty',
     content: {

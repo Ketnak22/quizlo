@@ -85,7 +85,7 @@ Requires Node.js 22.12 or newer.
    npm run seed
    ```
 
-   This writes five games with `seed-*` document ids: two quizzes, two matching quizzes and one map. Running it again resets those games, including their view counts, and leaves all other data alone.
+   This writes five games: two quizzes, two matching quizzes and one map. Games are matched by name, so running it again resets those games, including their view counts, and leaves all other data alone.
 
 5. **Start the app**
 

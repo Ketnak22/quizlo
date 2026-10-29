@@ -19,16 +19,22 @@ async function seed() {
   });
 
   const db = getFirestore();
+  const games = db.collection('quizzes');
   const batch = db.batch();
 
-  // Fixed document ids make the script safe to rerun: it resets the sample games, never duplicates them.
+  // Games are matched by name, so rerunning resets the sample games instead of duplicating them.
+  // New ones get an auto-generated id, the same as games made in the app.
+  const existing = new Map(
+    (await games.select('name').get()).docs.map((doc) => [doc.get('name'), doc.ref]),
+  );
+
   for (const game of seedGames) {
     const svgData = game.svg === null ? null : sanitizeSvg(game.svg);
     if (game.svg !== null && svgData === null) {
-      throw new Error(`Seed game ${game.id} has an invalid SVG.`);
+      throw new Error(`Seed game "${game.name}" has an invalid SVG.`);
     }
 
-    batch.set(db.collection('quizzes').doc(game.id), {
+    batch.set(existing.get(game.name) ?? games.doc(), {
       type: game.type,
       name: game.name,
       jsonData: JSON.stringify(game.content),
