@@ -1,5 +1,7 @@
 # quizlo
 
+[![CI](https://github.com/Ketnak22/quizlo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ketnak22/quizlo/actions/workflows/ci.yml)
+
 > **PL:** quizlo to aplikacja z quizami po polsku. Są trzy tryby: wpisywanie odpowiedzi, parowanie i odgadywanie regionów na mapie. Quizy i mapy można dodawać w kreatorach. Next.js, TypeScript i Firestore.
 
 A quiz app in Polish with typed-answer, matching and map modes. New quizzes and maps are made in the app, and the home page shows the most played ones.
