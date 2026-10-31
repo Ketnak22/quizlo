@@ -4,7 +4,7 @@
 
 A quiz app in Polish with typed-answer, matching and map modes. New quizzes and maps are made in the app, and the home page shows the most played ones.
 
-**Live demo:** DEMO_URL
+**Live demo:** https://quizlo-nu.vercel.app/
 
 | Home                                    | Quiz                                        |
 | --------------------------------------- | ------------------------------------------- |
