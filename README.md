@@ -8,6 +8,8 @@ A quiz app in Polish with typed-answer, matching and map modes. New quizzes and 
 
 **Live demo:** https://quizlo-nu.vercel.app/
 
+The demo is read-only: the quiz and map creators need `ADMIN_TOKEN`, and without it uploads are refused.
+
 | Home                                    | Quiz                                        |
 | --------------------------------------- | ------------------------------------------- |
 | ![Home page](docs/screenshots/home.png) | ![Matching quiz](docs/screenshots/quiz.png) |
