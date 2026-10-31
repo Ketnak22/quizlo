@@ -29,6 +29,7 @@ interface LoadedSvg {
 const REGION_SELECTOR = 'path[id]';
 const HOVER_FILL = '#ffe5b4';
 const SELECTED_FILL = 'var(--color-primary)';
+const EXCLUDED_FILL = '#fff';
 
 export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean }) {
   const router = useRouter();
@@ -105,10 +106,11 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
       const region = regions[index];
       if (!region) return;
 
-      if (selectedIndex === index) path.style.fill = SELECTED_FILL;
+      if (selectedIndex === index && !region.isExcluded) path.style.fill = SELECTED_FILL;
       else if (hoveredIndex === index) path.style.fill = HOVER_FILL;
+      else if (region.isExcluded) path.style.fill = EXCLUDED_FILL;
       else path.style.fill = region.originalFill;
-      path.style.opacity = region.isExcluded ? '0.3' : '';
+      path.classList.toggle(styles.excludedRegion, region.isExcluded);
     });
   }, [hoveredIndex, selectedIndex, regions]);
 
@@ -122,12 +124,36 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
     setHoveredIndex(index === -1 ? null : index);
   };
 
+  const toggleRegion = (index: number) => {
+    setRegions((prev) =>
+      prev.map((region, i) =>
+        i === index ? { ...region, isExcluded: !region.isExcluded } : region,
+      ),
+    );
+  };
+
   const handlePreviewClick = (e: MouseEvent<HTMLDivElement>) => {
     const index = getRegionIndex(e.target);
     if (index === -1) return;
 
+    if (index === selectedIndex) {
+      setSelectedIndex(null);
+      return;
+    }
+
     setSelectedIndex(index);
+    inputRefs.current[index]?.scrollIntoView({ block: 'nearest' });
     inputRefs.current[index]?.focus();
+  };
+
+  const handlePreviewRightClick = (e: MouseEvent<HTMLDivElement>) => {
+    const index = getRegionIndex(e.target);
+    if (index === -1) return;
+
+    e.preventDefault();
+    toggleRegion(index);
+    // Without this the hover color would hide the change until the cursor leaves the region.
+    setHoveredIndex(null);
   };
 
   const updateRegion = (index: number, change: Partial<Region>) => {
@@ -136,17 +162,11 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
     );
   };
 
-  const areAllExcluded = regions.every((region) => region.isExcluded);
-
-  const toggleAllRegions = () => {
-    setRegions((prev) =>
-      prev.map((region) => ({
-        ...region,
-        isExcluded: !areAllExcluded,
-        customName: areAllExcluded ? region.customName : '',
-      })),
-    );
+  const setAllExcluded = (isExcluded: boolean) => {
+    setRegions((prev) => prev.map((region) => ({ ...region, isExcluded })));
   };
+
+  const includedCount = regions.filter((region) => !region.isExcluded).length;
 
   const handleUpload = async () => {
     if (!svg) return;
@@ -234,32 +254,73 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
 
       {svg && (
         <div className={styles.mapLayout}>
-          <div
-            ref={previewRef}
-            className={styles.preview}
-            onMouseOver={handlePreviewHover}
-            onMouseLeave={() => setHoveredIndex(null)}
-            onClick={handlePreviewClick}
-            dangerouslySetInnerHTML={previewHtml}
-          />
+          <div className={styles.previewColumn}>
+            <p className={styles.mapHint}>{pl.mapCreator.mapHint}</p>
+
+            <div
+              ref={previewRef}
+              className={styles.preview}
+              onMouseOver={handlePreviewHover}
+              onMouseLeave={() => setHoveredIndex(null)}
+              onClick={handlePreviewClick}
+              onContextMenu={handlePreviewRightClick}
+              dangerouslySetInnerHTML={previewHtml}
+            />
+
+            <ul className={styles.mapLegend}>
+              <li>
+                <span className={`${styles.swatch} ${styles.swatchIncluded}`} />
+                {pl.mapCreator.legendIncluded}
+              </li>
+              <li>
+                <span className={`${styles.swatch} ${styles.swatchExcluded}`} />
+                {pl.mapCreator.legendExcluded}
+              </li>
+            </ul>
+          </div>
 
           <div className={styles.mapPanel}>
-            <button
-              type="button"
-              className={`${areAllExcluded ? styles.restoreButton : styles.removeButton} ${styles.toggleAll}`}
-              onClick={toggleAllRegions}
-            >
-              {areAllExcluded ? pl.mapCreator.includeAll : pl.mapCreator.excludeAll}
-            </button>
+            <div className={styles.regionsHeader}>
+              <p className={styles.regionCount} aria-live="polite">
+                {pl.mapCreator.includedCount(includedCount, regions.length)}
+              </p>
+              <div className={styles.regionsActions}>
+                <button
+                  type="button"
+                  className={styles.restoreButton}
+                  disabled={includedCount === regions.length}
+                  onClick={() => setAllExcluded(false)}
+                >
+                  {pl.mapCreator.includeAll}
+                </button>
+                <button
+                  type="button"
+                  className={styles.removeButton}
+                  disabled={includedCount === 0}
+                  onClick={() => setAllExcluded(true)}
+                >
+                  {pl.mapCreator.excludeAll}
+                </button>
+              </div>
+            </div>
+
+            <p className={styles.regionsHint}>{pl.mapCreator.regionsHint}</p>
 
             <div className={styles.regionList}>
               {regions.map((region, index) => (
                 <div
                   key={region.id}
-                  className={styles.row}
+                  className={`${styles.row} ${index === hoveredIndex || index === selectedIndex ? styles.rowActive : ''}`}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
+                  <input
+                    type="checkbox"
+                    className={styles.regionCheckbox}
+                    aria-label={pl.mapCreator.regionIncludedLabel(region.customName || region.id)}
+                    checked={!region.isExcluded}
+                    onChange={() => toggleRegion(index)}
+                  />
                   <input
                     type="text"
                     aria-label={pl.mapCreator.regionLabel(region.id)}
@@ -273,18 +334,6 @@ export default function MapCreator({ uploadsEnabled }: { uploadsEnabled: boolean
                     onChange={(e) => updateRegion(index, { customName: e.target.value })}
                     onFocus={() => setSelectedIndex(index)}
                   />
-                  <button
-                    type="button"
-                    className={region.isExcluded ? styles.restoreButton : styles.removeButton}
-                    aria-label={
-                      region.isExcluded ? pl.mapCreator.includeRegion : pl.mapCreator.excludeRegion
-                    }
-                    onClick={() =>
-                      updateRegion(index, { isExcluded: !region.isExcluded, customName: '' })
-                    }
-                  >
-                    {region.isExcluded ? '↺' : 'X'}
-                  </button>
                 </div>
               ))}
             </div>

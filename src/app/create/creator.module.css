@@ -107,13 +107,14 @@
   background-color: var(--color-remove);
 }
 
-.removeButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .restoreButton {
   background-color: var(--color-restore);
+}
+
+.removeButton:disabled,
+.restoreButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .plusButton {
@@ -197,6 +198,19 @@
   width: 100%;
 }
 
+.previewColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mapHint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
 .preview {
   max-height: 75vh;
   padding: 16px;
@@ -212,6 +226,49 @@
   height: auto;
 }
 
+.preview path[id] {
+  cursor: pointer;
+}
+
+.excludedRegion {
+  stroke: var(--color-muted) !important;
+  stroke-width: 1px !important;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.mapLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  list-style: none;
+}
+
+.mapLegend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.swatchIncluded {
+  background-color: #cfd8dc;
+}
+
+.swatchExcluded {
+  border: 1px dashed var(--color-muted);
+  background-color: #fff;
+}
+
 .mapPanel {
   display: flex;
   flex-direction: column;
@@ -222,8 +279,27 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.toggleAll {
-  align-self: center;
+.regionsHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.regionCount {
+  margin: 0;
+  font-weight: 600;
+}
+
+.regionsActions {
+  display: flex;
+  gap: 8px;
+}
+
+.regionsHint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
 }
 
 .regionList {
@@ -235,6 +311,19 @@
   overflow-y: scroll;
 }
 
+.rowActive input[type='text'] {
+  border-color: var(--color-primary);
+}
+
+.row input.regionCheckbox {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0 4px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
 .mapSubmitRow {
   display: flex;
   gap: 10px;
@@ -243,6 +332,12 @@
 .mapSubmitRow input {
   flex: 1;
   min-width: 0;
+}
+
+@media (hover: none) {
+  .mapHint {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
