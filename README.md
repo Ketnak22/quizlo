@@ -1,12 +1,10 @@
 # quizlo
 
-> **PL:** quizlo to aplikacja z quizami po polsku w trzech trybach: wpisywanie odpowiedzi, parowanie i odgadywanie regionów na mapie. Quizy i mapy można dodawać w kreatorach, a strona główna pokazuje najpopularniejsze gry. Projekt powstał w Next.js 15, TypeScripcie i Firestore.
+> **PL:** quizlo to aplikacja z quizami po polsku. Są trzy tryby: wpisywanie odpowiedzi, parowanie i odgadywanie regionów na mapie. Quizy i mapy można dodawać w kreatorach. Next.js, TypeScript i Firestore.
 
-A Polish quiz app with typed-answer, matching and map modes, built with Next.js, TypeScript and Firestore.
+A quiz app in Polish with typed-answer, matching and map modes. New quizzes and maps are made in the app, and the home page shows the most played ones.
 
 **Live demo:** DEMO_URL
-
-## Screenshots
 
 | Home                                    | Quiz                                        |
 | --------------------------------------- | ------------------------------------------- |
@@ -16,136 +14,65 @@ A Polish quiz app with typed-answer, matching and map modes, built with Next.js,
 | ------------------------------------- | ------------------------------------------------ |
 | ![Map game](docs/screenshots/map.png) | ![Map creator](docs/screenshots/map-creator.png) |
 
-## Features
+## What it does
 
-- **Three game modes**
-  - Quiz: type every answer on the list.
-  - Matching quiz: fill in a table, for example the capital of each country.
-  - Map: name the regions of an SVG map, which change color as you guess them.
-- **Forgiving answers:** case, Polish diacritics and extra spaces do not matter, so `lodz` counts as `Łódź`.
-- **Creators:** build a quiz in a form, or drop in an SVG and name its regions by clicking them on the map.
-- **Popular quizzes:** the home page ranks games by view count.
-- **Responsive UI** with loading, error and 404 screens.
-- **Demo-safe by default:** publishing needs an admin token, and uploads are rate limited.
+- **Quiz:** type every answer on the list.
+- **Matching quiz:** fill in a table, like the symbol of each chemical element.
+- **Map:** name the regions of an SVG map, which change color as you guess them.
+- **Quiz creator:** build a quiz in a form.
+- **Map creator:** drop in an SVG, then left-click a region to name it and right-click to leave it out of the game. There are three sample maps, since most people don't have an SVG lying around.
 
-## Tech stack
+Answers don't depend on case, Polish characters or extra spaces, so `lodz` counts as `Łódź`.
 
-- **Next.js 15 (App Router) and React 19:** server components for the data-driven pages and client components for the games.
-- **TypeScript in strict mode**, with no `any` in the codebase.
-- **Firestore (Admin SDK):** a document database suits games whose content differs by mode, and it needs no server to maintain. It is only accessed from the server, so no Firebase config reaches the browser.
-- **Zod:** one set of schemas validates the creator forms in the browser and the uploads on the server, so the two cannot drift apart. The same schemas parse game data when it is loaded.
-- **DOMPurify with jsdom:** uploaded SVGs are rendered as markup, so they are sanitized before they are stored to prevent stored XSS.
-- **Vitest, ESLint, Prettier and GitHub Actions** keep the code checked on every push.
+## How it's built
 
-## Architecture
+Next.js with React, TypeScript and Firestore.
 
-```
-scripts/                Firestore seed script and sample games
-src/app/
-  api/                  Route handlers: read a game, upload a quiz or a map
-  components/           Shared UI (navigation, quiz selector, status screens)
-  create/               Quiz and map creators
-  game/[id]/            Game page, players and game hooks
-  i18n/pl.ts            All interface text
-  lib/                  Firestore access, schemas, SVG handling, answer logic, upload protection
-  types/                Shared types
-  utils/                Text helpers
-```
+- Firestore is only accessed from the server through the Admin SDK, so no Firebase config reaches the browser.
+- The forms and the API share the same Zod schemas, so they can't drift apart.
+- Uploaded SVGs get rendered as markup, so they're sanitized with DOMPurify before they're stored.
+- Publishing needs `ADMIN_TOKEN`. With no token set, uploads are refused and the creators are read-only, which makes it safe to run as a public demo.
+- Uploads are rate limited per IP. The limit lives in memory, so it's not exact on serverless, but it slows abuse down.
 
-The home page is a server component that reads the game list directly from Firestore on every request. The game page checks the game type on the server, counts the view and renders the matching player. The player then fetches the game from `/api/game/[id]` and parses it with the Zod schemas. Game progress lives in React state: the `useAnswerGame` hook stores the guessed answers and derives the score and the end of the game from them. Answer checking is a pure function, `findNewMatches`, shared by every mode. Creators validate their input with the same schemas and post it to `/api/upload/*`. Those endpoints check the rate limit and the admin token, validate the data again, sanitize any SVG and write the game to Firestore.
+Most of the code is in `src/app`: `game/[id]` has the players, `create` the creators, `api` the routes and `lib` the Firestore access, schemas and answer checking.
 
-## Running locally
+## Running it locally
 
-Requires Node.js 22.12 or newer.
-
-1. **Clone the repository and install dependencies**
-
-   ```bash
-   git clone https://github.com/Ketnak22/quizlo.git
-   cd quizlo
-   npm install
-   ```
-
-2. **Set up Firebase**
-   1. Create a project in the [Firebase console](https://console.firebase.google.com/).
-   2. Open **Build > Firestore Database** and create a database in production mode. The app connects through the Admin SDK, so the default deny-all security rules can stay in place.
-   3. Open **Project settings > Service accounts** and click **Generate new private key**.
-
-3. **Configure the environment**
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Copy the values from the downloaded JSON key into `.env`. Do not commit the key or `.env`.
-
-4. **Add sample games** (optional)
-
-   ```bash
-   npm run seed
-   ```
-
-   This writes five games: two quizzes, two matching quizzes and one map. Games are matched by name, so running it again resets those games, including their view counts, and leaves all other data alone.
-
-5. **Start the app**
-
-   ```bash
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000).
-
-### Environment variables
-
-Copy `.env.example` to `.env`. All variables are server-side only.
-
-| Variable                | Description                                                                                                        |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `FIREBASE_PROJECT_ID`   | Firebase project id, the `project_id` field of the service account key.                                            |
-| `FIREBASE_CLIENT_EMAIL` | Service account email, the `client_email` field of the key.                                                        |
-| `FIREBASE_PRIVATE_KEY`  | Service account private key, the `private_key` field of the key. Keep it on one line, in double quotes, with `\n`. |
-| `ADMIN_TOKEN`           | Secret required to publish quizzes and maps. When empty, the creators are read-only and uploads are refused.       |
-
-Generate an admin token with:
+You need Node.js and a Firebase project with a Firestore database.
 
 ```bash
-node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+git clone https://github.com/Ketnak22/quizlo.git
+cd quizlo
+npm install
+cp .env.example .env
 ```
 
-### Scripts
+Generate a key in the Firebase console under **Project settings > Service accounts** and copy its values to `.env`:
 
-| Command                | Description                         |
-| ---------------------- | ----------------------------------- |
-| `npm run dev`          | Start the development server        |
-| `npm run build`        | Create a production build           |
-| `npm start`            | Serve the production build          |
-| `npm run lint`         | Run ESLint                          |
-| `npm run format`       | Format the code with Prettier       |
-| `npm run format:check` | Check the formatting                |
-| `npm run typecheck`    | Run the TypeScript compiler         |
-| `npm test`             | Run the Vitest suite                |
-| `npm run seed`         | Write the sample games to Firestore |
+| Variable                | Value                                                                |
+| ----------------------- | -------------------------------------------------------------------- |
+| `FIREBASE_PROJECT_ID`   | `project_id` from the key                                            |
+| `FIREBASE_CLIENT_EMAIL` | `client_email` from the key                                          |
+| `FIREBASE_PRIVATE_KEY`  | `private_key` from the key, on one line, in double quotes, with `\n` |
+| `ADMIN_TOKEN`           | Any long secret. Leave it empty for read-only mode                   |
 
-## Deploying to Vercel
+Then add the sample games and start the app:
 
-1. Import the repository in [Vercel](https://vercel.com/new). The Next.js settings are detected automatically.
-2. Under **Settings > Environment Variables**, add `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY`.
-3. Leave `ADMIN_TOKEN` unset for a public read-only demo, or set it to publish games from the live site.
-4. Deploy, then replace `DEMO_URL` at the top of this file with the production URL.
+```bash
+npm run seed
+npm run dev
+```
 
-The build does not connect to Firebase, so it works without credentials. The rate limit is kept in memory for each server instance, so on serverless hosting it slows down abuse rather than enforcing an exact global limit.
+It runs on [localhost:3000](http://localhost:3000). The seed writes five games and is safe to rerun, since it matches them by name. Rerunning resets their view counts.
 
-## Roadmap
+## Scripts
 
-- Timed mode with a personal best kept for each game.
-- User accounts in place of the shared admin token, so people can manage their own games.
-- Search and categories on the home page.
-- More than one accepted spelling per answer.
-
-## Map data
-
-The sample maps, including the ones offered by the map creator in demo mode (`public/demo-maps`, listed in `src/app/create/map/demoMaps.ts`), are made from [Natural Earth](https://www.naturalearthdata.com/) data, which is in the public domain. See [scripts/seed-data/README.md](scripts/seed-data/README.md).
+| Command          | What it does                        |
+| ---------------- | ----------------------------------- |
+| `npm run dev`    | Start the dev server                |
+| `npm run seed`   | Write the sample games to Firestore |
+| `npm run backup` | Save Firestore to `backups/`        |
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). The sample maps are made from [Natural Earth](https://www.naturalearthdata.com/) data, which is in the public domain. See [scripts/seed-data/README.md](scripts/seed-data/README.md).
