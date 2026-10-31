@@ -37,6 +37,7 @@ Next.js with React, TypeScript and Firestore.
 - Uploaded SVGs get rendered as markup, so they're sanitized with DOMPurify before they're stored.
 - Publishing needs `ADMIN_TOKEN`. With no token set, uploads are refused and the creators are read-only, which makes it safe to run as a public demo.
 - Uploads are rate limited per IP. The limit lives in memory, so it's not exact on serverless, but it slows abuse down.
+- Every push is checked on GitHub Actions: lint, formatting, types, tests and build.
 
 Most of the code is in `src/app`: `game/[id]` has the players, `create` the creators, `api` the routes and `lib` the Firestore access, schemas and answer checking.
 
